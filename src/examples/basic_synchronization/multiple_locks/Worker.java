@@ -60,7 +60,7 @@ public class Worker {
     }
 
     /**
-     * This method writes to {@code list1} and {@code list2}.
+     * Writes to {@code list1} and {@code list2}.
      * If two threads call this method, they will try to write
      * to both lists concurrently, and this will create the
      * same problem we had with the ++ operator, because writing

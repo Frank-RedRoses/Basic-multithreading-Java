@@ -9,6 +9,8 @@ import java.util.concurrent.BlockingQueue;
  * or more threads (producers) generate items and add them to a shared
  * data structure (a {@code queue}), while other threads (consumers)
  * retrieve and process those items.
+ *
+ *
  */
 public class App {
     /**
@@ -16,7 +18,14 @@ public class App {
      * of the {@code java.util.concurrent} package, which provides
      * thread-safe classes for concurrency programming.
      * Since this classes handle synchronization internally,
-     * there is no need to use the {@code synchronized} keyword
+     * there is no need to use the {@code synchronized} keyword.
+     * <p>
+     * It is generally better to use thread-safe classes and methods
+     * from the  {@code java.util.concurrent} package rather than relying
+     * on low-level synchronization with the {@code synchronized} keyword.
+     * However, in some cases, manual synchronization may still be necessary
+     * depending on the specific requirements of the application.
+     * </p>
      */
     private static BlockingQueue<Integer> queue = new ArrayBlockingQueue<Integer>(10);
 

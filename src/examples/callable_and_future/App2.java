@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Random;
 import java.util.concurrent.*;
 
-public class App {
+public class App2 {
 
     /**
      * Example implementation with an anonymous call of {@code Callable}.
@@ -27,15 +27,16 @@ public class App {
         ExecutorService executor = Executors.newCachedThreadPool();
 
         // This is a simple example of retrieving value from a thread.
-        // However, using a collection as <parameter> allows you to store
-        // result from multiple threads, enabling concurrent processing.
-        Future<Integer> future = executor.submit(
+        // However, using Future<?> and Callable<Void> as the parameters
+        // allows you to return a null value, and still being able to use
+        // the methods of the Future interface.
+        Future<?> future = executor.submit(
                 // Executes a task.
-                new Callable<Integer>() {
+                new Callable<Void>() {
                     // <parameter> datatype depends on what you want to return from the thread.
 
                     @Override
-                    public Integer call() throws Exception {
+                    public Void call() throws Exception {
                         final Random random = new Random();
                         int duration = random.nextInt(4000);
 
@@ -51,7 +52,7 @@ public class App {
                         System.out.println("Finished thread.");
 
                         // The return type is determined by the type parameter of the Callable interface.
-                        return duration;
+                        return null;
                     }
                 });
 

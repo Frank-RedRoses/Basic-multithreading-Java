@@ -2,6 +2,21 @@ package examples.interrupting_threads;
 
 import java.util.Random;
 
+/**
+ * Demonstrates how to interrupt a running thread in Java using
+ * the built-in thread interruption mechanism.
+ * <p>
+ * It is important NOT to confuse thread interruption with:
+ * </p>
+ * <ul>
+ *     <li><b>Software interrupts:</b> These occur when the CPU periodically
+ *     interrupts the current instruction flow to execute a registered piece of
+ *     code, such as the thread scheduler.</li>
+ *     <li><b>Hardware interrupts:</b> These happen when the CPU responds to an
+ *     external hardware signal by interrupting the current process to handle
+ *     the event.</li>
+ * </ul>
+ */
 public class App {
 
     public static void main(String[] args) throws InterruptedException {

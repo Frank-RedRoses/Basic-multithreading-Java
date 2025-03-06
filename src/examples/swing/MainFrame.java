@@ -8,8 +8,10 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Represents the UI of the Swing application, what is shown in
- * the UI window and the main Swing thread.
+ * Represents the main UI windows of the Swing application.
+ * <br>
+ * This class extends {@code JFrame} and runs on the Event Dispatch Thread (EDT)
+ * ensuring proper handling of UI components.
  */
 public class MainFrame extends JFrame {
     private final JLabel progressLabel;
@@ -19,43 +21,43 @@ public class MainFrame extends JFrame {
     public MainFrame(String title) {
         super(title);
 
-        // Instantiate the window elements
+        // Initialize the UI components
         progressLabel = new JLabel("0");
         statusLabel = new JLabel("Task not completed");
         startButton = new JButton("Start");
 
 
-        // Set the layout of the GUI window
+        // Configure the layout of the main window
         setLayout(new GridBagLayout());
         GridBagConstraints layoutConstraints = new GridBagConstraints();
 
         layoutConstraints.fill = layoutConstraints.NONE;
 
-        // add count1 label to GUI
+        // add count1 label to main window
         layoutConstraints.gridx = 0;
         layoutConstraints.gridy = 0;
         layoutConstraints.weightx = 1;
         layoutConstraints.weighty = 1;
         add(progressLabel, layoutConstraints);
 
-        // add status label to GUI
+        // add status label to main window
         layoutConstraints.gridx = 0;
         layoutConstraints.gridy = 1;
         layoutConstraints.weightx = 1;
         layoutConstraints.weighty = 1;
         add(statusLabel, layoutConstraints);
 
-        // add start button to GUI
+        // add start button to main window
         layoutConstraints.gridx = 0;
         layoutConstraints.gridy = 2;
         layoutConstraints.weightx = 1;
         layoutConstraints.weighty = 1;
         add(startButton, layoutConstraints);
-        // Action to execute when the button is clicked.
+        // Defines the action to execute when the button is clicked.
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent clickEvent) {
-                startSwingThread();
+                startSwingThreadExample();
             }
         });
 
@@ -65,33 +67,44 @@ public class MainFrame extends JFrame {
         setVisible(true);
     }
 
-    private void startSwingThread() {
+    private void startSwingThreadExample() {
         /*
-          * If Void use as a <parameter> in SwingWorker, the return value of
-          * doInBackground() method should be Void in the method signature and
-          * null in the return statement. This is the simplest case for a
-          * thread that just run code, returns no value, and no information
-          * is updated in the UI.
-          * The first <parameter> in SwingWorker represent the return value,
-          * in this example is Boolean, but it can be any other datatype.
-          * The second <parameter> in SwingWorker represent the value that is
-          * used to update dynamically the UI.
+         * When using `Void` as the first type parameter in `SwingWorker`,
+         * the `doInBackground()` method must return `Void` in its signature
+         * and `null` in the return statement.
+         * This is the simplest case for a background thread that executes code
+         * without returning a value or updating the UI.
+         *
+         * The first type parameter in `SwingWorker` defines the return type
+         * of `doInBackground()`. In this example, it is `Boolean`, but in can
+         * be any data type.
+         *
+         * The second parameter defines the type of the intermediate values
+         * used to update the UI dynamically. In this example, it is `Integer`.
          */
         SwingWorker<Boolean, Integer> worker = new SwingWorker<>() {
 
             /*
-             * This method executes a thread by SwingWorker.
-             * This thread should not be used to update the UI, only the main
-             * Swing thread is able to update the UI in a safe manner, this
-             * is done by calling the done() and process() method of the
-             * SwingWorker class.
-             * This method can be set to throw an Exception that will be caught by
-             * the try/catch block inside the done() method as a ExecutionException.
-             * Also, if this thread is interrupted, methods like Thread.sleep()
-             * will throw an InterruptedException that will be caught by done() as well,
-             * inside the catch block for InterruptedException.
+             * Executes a background thread using `SwingWorker`.
+             *
+             * This thread should **not** update the UI directly; only the main Swing thread
+             * should handle UI updates to ensure thread safety. UI updates are managed
+             * through the `done()` and `process()` methods of the SwingWorker class.
+             *
+             * This method may throw an `Exception`, which will be caught as an
+             * `ExecutionException` inside the `done()` method. Additionally, if this
+             * thread is interrupted (e.g., while calling `Thread.sleep()`), it will
+             * throw an `InterruptedException`, which will also be handled in `done()`.
+             *
              * Note: Search about if manually checking is needed for the
-             * InterruptedException and Thread.sleep() inside of doInBackground().
+             * InterruptedException and Thread.sleep() inside of `doInBackground()`.
+             *
+             * Answer: In SwingWorker `doInBackground`, manual interruptions are not
+             * strictly required because calling `Thread.sleep()` inside `doInBackground()`
+             * will automatically throw an `InterruptedException` if the thread is interrupted.
+             * However, manually checking for interruption can still be useful if the task
+             * involves long-running loops or computations that don't call methods
+             * like Thread.sleep().
              */
             @Override
             protected Boolean doInBackground() throws Exception {
@@ -105,8 +118,11 @@ public class MainFrame extends JFrame {
             }
 
             /*
-             * {@code done()} is call when the thread {@code doInBackground()}
-             * is finished. Inside this method you can safely update the UI.
+             * The `done()` method is called when `doInBackground()` has finished executing.
+             * This method runs on the Event Dispatch Thread (EDT), so it is safe to update
+             * the UI here.
+             * In this implementation, it updates the text of the `JLabel` to display
+             * "Task completed! Status: " followed by the result obtain using `get()`.
              */
             @Override
             protected void done() {
@@ -121,12 +137,14 @@ public class MainFrame extends JFrame {
             }
 
             /*
-             * This method receives the data from the publish() method and
-             * can safely update the UI with like, for example, a progress bar.
-             * The reason why the parameter of this method is a List<Integer>
-             * is because there is no guarantee that the value returned by
-             * publish(i) is in real time, it can be returned on pieces of
-             * data or chunks.
+             * This method receives data from the `publish()` method and is used
+             * to safely update the UI, such as updating a progress bar or a label.
+             *
+             * The parameter `chunks` is a `List<Integer>` because `publish(i)` can
+             * send multiple pieces of data over time, not necessarily all at once.
+             * The method process data in chunks, but in this case, only the last
+             * value in the list is used to update the `JLabel` with the message
+             * "Current value: " followed by the value.
              */
             @Override
             protected void process(List<Integer> chunks) {
@@ -136,11 +154,11 @@ public class MainFrame extends JFrame {
         };
 
         worker.execute();
-        // SwingWorker executes just one time, calling again execute()
-        // will not run doInBackground() for a second time.
-        // To running this code again you need a new instance of SwingWorker.
+        /* `SwingWorker` can only be executed once. Calling `execute()`
+         * again will not run `doInBackground` a second time. To run the
+         * code again, a new instance of `SwingWorker` must be created.
+         */
 
-        // The method worker.cancel() can be call to interrupt the thread
-        // executed by worker.execute()
+        //`worker.cancel()` can be called to interrupt the thread executed by `worker.execute()`.
     }
 }
